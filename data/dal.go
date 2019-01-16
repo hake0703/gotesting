@@ -2,9 +2,7 @@ package dal
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
-	"log"
 
 	_ "github.com/lib/pq"
 )
@@ -56,25 +54,23 @@ func HeartBeat() {
 }
 
 // Create
-func CreateUserCommand(firstName string, lastName string, age int, luckyNumber int) {
-	id := 0
+func CreateUserCommand(usr User) (id int) {
 	db, err := sql.Open(driver, GetConnectionString())
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
-	err = db.QueryRow(CreateUser, firstName, lastName, age, luckyNumber).Scan(&id)
+	err = db.QueryRow(CreateUser, usr.FirstName, usr.LastName, usr.Age, usr.LuckyNumber).Scan(&id)
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Newly Generated Record ID : ", id)
+	return id
 }
 
 // Update
-func UpdateNumberCommand(userID int, luckyNumber int) {
-
+func UpdateLuckyNumberCommand(userID int, luckyNumber int) {
 	db, err := sql.Open(driver, GetConnectionString())
 	if err != nil {
 		panic(err)
@@ -96,7 +92,7 @@ func UpdateNumberCommand(userID int, luckyNumber int) {
 }
 
 // Read
-func GetUserWithID(userID int) (payload string) {
+func GetUserWithID(userID int) (payload User) {
 	db, err := sql.Open(driver, GetConnectionString())
 	if err != nil {
 		panic(err)
@@ -108,22 +104,17 @@ func GetUserWithID(userID int) (payload string) {
 	err = row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.LuckyNumber, &user.Age)
 	switch err {
 	case sql.ErrNoRows:
-		payload = "No rows were returned!"
+		payload = User{}
 	case nil:
-		msg, err := json.Marshal(user)
-		if err != nil {
-			log.Println(err)
-		}
-		payload = string(msg) // Figure out how to return JSON
+		payload = user
 	default:
 		panic(err)
 	}
-
 	return
 }
 
 // Read
-func GetUserWithLastName(lastName string) (payload string) {
+func GetUserWithLastName(lastName string) (payload []User) {
 	// Open connection
 	db, err := sql.Open(driver, GetConnectionString())
 	if err != nil {
@@ -154,11 +145,7 @@ func GetUserWithLastName(lastName string) (payload string) {
 		panic(err)
 	}
 
-	msg, err := json.Marshal(records) // Serialize records to Json
-	if err != nil {
-		log.Println(err)
-	}
-	payload = string(msg)
+	payload = records
 	return
 }
 
