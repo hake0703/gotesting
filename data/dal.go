@@ -27,7 +27,7 @@ const (
 	GetUserByLastName = "SELECT * FROM web_users WHERE last_name = $1;"
 	// Commands
 	CreateUser            = "INSERT INTO web_users (first_name, last_name, age, lucky_number) Values($1,$2,$3,$4) RETURNING id;"
-	UpdateUserLuckyNumber = "UPDATE web_users SET lucky_number = $1 WHERE id = $2 RETURNING *;"
+	UpdateUserLuckyNumber = "UPDATE web_users SET lucky_number = $1 WHERE id = $2;"
 	DeleteUserByID        = "DELETE FROM web_users WHERE id = $1;"
 )
 
@@ -50,7 +50,7 @@ func HeartBeat() {
 		panic(err)
 	}
 
-	fmt.Println("You're Alive!!!!!!!")
+	fmt.Println("Database Detected.")
 }
 
 // Create
@@ -70,7 +70,7 @@ func CreateUserCommand(usr User) (id int) {
 }
 
 // Update
-func UpdateLuckyNumberCommand(userID int, luckyNumber int) {
+func UpdateLuckyNumberCommand(userID int, luckyNumber int) (count int64) {
 	db, err := sql.Open(driver, GetConnectionString())
 	if err != nil {
 		panic(err)
@@ -83,12 +83,12 @@ func UpdateLuckyNumberCommand(userID int, luckyNumber int) {
 		panic(err)
 	}
 
-	count, err := result.RowsAffected()
+	count, err = result.RowsAffected()
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Records Updated: ", count)
+	return
 }
 
 // Read
@@ -150,7 +150,7 @@ func GetUserWithLastName(lastName string) (payload []User) {
 }
 
 // Delete
-func DeleteUser(userID int) {
+func DeleteUser(userID int) (count int64) {
 	db, err := sql.Open(driver, GetConnectionString())
 	if err != nil {
 		panic(err)
@@ -163,10 +163,10 @@ func DeleteUser(userID int) {
 		panic(err)
 	}
 
-	count, err := result.RowsAffected()
+	count, err = result.RowsAffected()
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Records Updated: ", count)
+	return count
 }

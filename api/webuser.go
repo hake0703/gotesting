@@ -2,7 +2,6 @@ package webuser
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -30,6 +29,7 @@ func Routes() *chi.Mux {
 	return router
 }
 
+//Tested
 func GetUserByID(writer http.ResponseWriter, req *http.Request) {
 	userID, err := strconv.Atoi(chi.URLParam(req, "userID"))
 	if err != nil {
@@ -40,25 +40,28 @@ func GetUserByID(writer http.ResponseWriter, req *http.Request) {
 	render.JSON(writer, req, user)
 }
 
+//Tested
 func GetUserByLastName(writer http.ResponseWriter, req *http.Request) {
 	lastName := chi.URLParam(req, "lastname")
 	user := dal.GetUserWithLastName(lastName)
 	render.JSON(writer, req, user)
 }
 
+//Tested
 func Delete(writer http.ResponseWriter, req *http.Request) {
 	userID, err := strconv.Atoi(chi.URLParam(req, "userID"))
 	if err != nil {
 		panic(err) // MiddleWare will catch.
 	}
 
+	count := dal.DeleteUser(userID)
 	resp := make(map[string]string) // Mapping a key value pairs
-	resp["message"] = "User Delete Completed Successfully."
+	resp["message"] = "Records Deleted: " + strconv.Itoa(int(count))
 
-	dal.DeleteUser(userID)
 	render.JSON(writer, req, resp)
 }
 
+//Tested
 func Update(writer http.ResponseWriter, req *http.Request) {
 	userID, err := strconv.Atoi(chi.URLParam(req, "userID"))
 	if err != nil {
@@ -70,15 +73,15 @@ func Update(writer http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	dal.UpdateLuckyNumberCommand(userID, luckyNumber)
+	count := dal.UpdateLuckyNumberCommand(userID, luckyNumber)
 
 	resp := make(map[string]string)
-	resp["message"] = "User Update Completed Successfully."
+	resp["message"] = "Records Updated: " + strconv.Itoa(int(count))
 	render.JSON(writer, req, resp)
 }
 
+//Tested
 func Create(writer http.ResponseWriter, req *http.Request) {
-	fmt.Println("I am creating.")
 	user := dal.User{}
 	err := json.NewDecoder(req.Body).Decode(&user)
 
@@ -86,7 +89,7 @@ func Create(writer http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	fmt.Println(user)
+	id := dal.CreateUserCommand(user) // New User ID
 
-	newID := dal.CreateUserCommand(user)
+	render.JSON(writer, req, id)
 }
