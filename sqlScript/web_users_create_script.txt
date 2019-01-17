@@ -1,0 +1,20 @@
+-- Table: public.web_users
+
+-- DROP TABLE public.web_users;
+
+CREATE TABLE public.web_users
+(
+    id integer NOT NULL DEFAULT nextval('web_users_id_seq'::regclass),
+    first_name character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    last_name character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    lucky_number integer,
+    age integer,
+    CONSTRAINT web_users_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.web_users
+    OWNER to postgres;
