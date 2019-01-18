@@ -1,4 +1,4 @@
-## GO Testing Cuz I Can!!!!
+## GO Testing Because I Can!!!!
 
 This repo contains a quick(very quick and dirty) demo of building a GO api. Remember, I did this in just a few hours so there is definitely some refactoring I would do with more time..
 
